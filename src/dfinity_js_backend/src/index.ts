@@ -25,18 +25,19 @@ import {
   binaryAddressFromPrincipal,
   hexAddressFromPrincipal,
 } from "azle/canisters/ledger";
-//import { hashCode } from "hashcode";
 import { v4 as uuidv4 } from "uuid";
 
+// Define property record structure
 const Property = Record({
   id: text,
-  address: text,//address of the property
-  propType: text, //type of property(home, land, office, etc)
-  description: text,//description of the property
+  address: text,
+  propType: text,
+  description: text,
   size: text,
   price: nat64,
 });
 
+// Define payload structure for adding property
 const PropertyPayload = Record({
   address: text,
   propType: text,
@@ -45,172 +46,189 @@ const PropertyPayload = Record({
   price: nat64,
 });
 
+// Define possible listing statuses
 const ListingStatus = Variant({
-  Active: text,//property is available for sale
-  Sold: text,//property has been sold
-  rented: text,//property has been rented
-  PaymentPending: text,//payment for property is pending
+  Active: text,
+  Sold: text,
+  Rented: text,
+  PaymentPending: text,
 });
 
+// Define property listing record structure
 const Listings = Record({
-  propertyId: text,//id of the property
-  date: text,//date the property was listed
-  agent: Principal, //agent who listed the property
-  status: ListingStatus,//status of the property listing
+  propertyId: text,
+  date: text,
+  agent: Principal,
+  status: ListingStatus,
 });
 
+// Define user record structure
 const User = Record({
   id: text,
   name: text,
   phoneNo: nat64,
   email: text,
-  listing: Vec(text),//list of properties the user has listed
+  listing: Vec(text),
 });
 
+// Define payload structure for adding user
 const UserPayload = Record({
   name: text,
   phoneNo: nat64,
   email: text,
 });
 
+// Define possible error messages
 const Message = Variant({
   NotFound: text,
   InvalidPayload: text,
 });
 
-/**
- * `productsStorage` - it's a key-value data structure used to store products listed by sellers in the marketplace.
- * {@link StableBTreeMap} is a self-balancing tree acting as durable data storage that preserves data across canister upgrades.
- * For this contract, we've chosen {@link StableBTreeMap} for several reasons:
- * - `insert`, `get`, and `remove` operations have a constant time complexity of O(1).
- * - Data stored in this map persists across canister upgrades, unlike using a HashMap where data is stored in the heap and can be lost after a canister upgrade.
- */
-
+// Create stable B-tree maps for storing data
 const propertyStorage = StableBTreeMap(0, text, Property);
 const userStorage = StableBTreeMap(1, text, User);
 const propertyListingStorage = StableBTreeMap(2, text, Listings);
 
+// Export canister interface
 export default Canister({
-  //add property
+  // Add property to the system
   addProperty: update(
     [PropertyPayload],
     Result(Property, Message),
     (payload) => {
-      if (typeof payload !== "object" || Object.keys(payload).length === 0) {
-        return Err({ NotFound: "invalid payoad" });
+      // Validate payload
+      if (!payload || typeof payload !== "object" || Object.keys(payload).length === 0) {
+        return Err({ InvalidPayload: "Invalid payload" });
       }
+
+      // Generate unique ID for the property
       const propertyId = uuidv4();
-      const propety = {
+
+      // Create property object
+      const property = {
         id: propertyId,
         ...payload,
       };
-      propertyStorage.insert(propertyId, propety);
-      return Ok(propety);
+
+      // Store property in the storage
+      propertyStorage.insert(propertyId, property);
+      return Ok(property);
     }
   ),
 
-  //get property
+  // Get property by ID
   getProperty: query([text], Opt(Property), (propertyId) => {
     return propertyStorage.get(propertyId);
   }),
 
-  //get all properties
+  // Get all properties
   getAllProperties: query([], Vec(Property), () => {
     return propertyStorage.values();
   }),
 
-  //adduser
+  // Add user to the system
   addUser: update([UserPayload], Result(User, Message), (payload) => {
-    if (typeof payload !== "object" || Object.keys(payload).length === 0) {
-      return Err({ NotFound: "invalid payoad" });
+    // Validate payload
+    if (!payload || typeof payload !== "object" || Object.keys(payload).length === 0) {
+      return Err({ InvalidPayload: "Invalid payload" });
     }
+
+    // Generate unique ID for the user
     const userId = uuidv4();
+
+    // Create user object
     const user = {
       id: userId,
       listing: [],
       ...payload,
     };
+
+    // Store user in the storage
     userStorage.insert(userId, user);
     return Ok(user);
   }),
 
-  //get user
+  // Get user by ID
   getUser: query([text], Opt(User), (userId) => {
     return userStorage.get(userId);
   }),
 
-  //get all users
+  // Get all users
   getAllUsers: query([], Vec(User), () => {
     return userStorage.values();
   }),
 
-  //add property listing
+  // Add property listing
   addPropertyListing: update(
     [text],
     Result(Listings, Message),
     (propertyId) => {
-      const propertyOpt = propertyStorage.get(propertyId);
-      if (propertyOpt === null) {
-        return Err({ NotFound: "property not found" });
+      // Check if property exists
+      const property = propertyStorage.get(propertyId);
+      if (!property) {
+        return Err({ NotFound: "Property not found" });
       }
 
+      // Create listing object
       const listing = {
-        propertyId: propertyId,
+        propertyId,
         date: new Date().toISOString(),
         agent: ic.caller(),
         status: { Active: "For sale" },
       };
+
+      // Store listing in the storage
       propertyListingStorage.insert(propertyId, listing);
       return Ok(listing);
     }
   ),
 
-  //get property listing
+  // Get property listing by property ID
   getPropertyListing: query([text], Opt(Listings), (propertyId) => {
     return propertyListingStorage.get(propertyId);
   }),
 
-  //get all property listings
+  // Get all property listings
   getAllPropertyListings: query([], Vec(Listings), () => {
     return propertyListingStorage.values();
   }),
 
-  //user add property to listing
+  // Make bid on a property
   makeBid: update(
     [text, text],
     Result(text, Message),
     (userId, propertyId) => {
-      const userOpt = userStorage.get(userId);
-      if (userOpt === null) {
-        return Err({ NotFound: "user not found" });
-      }
-      const propertyOpt = propertyStorage.get(propertyId);
-      if (propertyOpt === null) {
-        return Err({ NotFound: "property not found" });
+      // Check if user exists
+      const user = userStorage.get(userId);
+      if (!user) {
+        return Err({ NotFound: "User not found" });
       }
 
-      const user = userOpt.Some;
+      // Check if property exists
+      const property = propertyStorage.get(propertyId);
+      if (!property) {
+        return Err({ NotFound: "Property not found" });
+      }
+
+      // Add property to user's listing
       user.listing.push(propertyId);
       userStorage.insert(userId, user);
 
-      const listingOpt = propertyListingStorage.get(propertyId);
-      if (listingOpt === null) {
-        return Err({ NotFound: "property listing not found" });
+      // Update property listing status
+      const listing = propertyListingStorage.get(propertyId);
+      if (!listing) {
+        return Err({ NotFound: "Property listing not found" });
       }
-      const listing = listingOpt.Some;
-      listing.status = { PaymentPending: "Payment_Pending" };
+      listing.status = { PaymentPending: "Payment Pending" };
       propertyListingStorage.insert(propertyId, listing);
-      return Ok(`property ${propertyId} added to user ${userId}listing and status updated`);
+
+      return Ok(`Property ${propertyId} added to user ${userId} listing and status updated`);
     }
   ),
 
-  //get user listing
+  // Get user's property listings
   getUserListing: query([text], Vec(text), (userId) => {
-    const userOpt = userStorage.get(userId);
-    if (userOpt === null) {
-      return [];
-    }
-    const user = userOpt.Some;
-    return user.listing;
+    const user = userStorage.get(userId);
+    return user ? user.listing : [];
   }),
 });
