@@ -19,12 +19,7 @@ import {
   bool,
   Canister,
 } from "azle";
-import {
-  Ledger,
-  binaryAddressFromAddress,
-  binaryAddressFromPrincipal,
-  hexAddressFromPrincipal,
-} from "azle/canisters/ledger";
+
 //import { hashCode } from "hashcode";
 import { v4 as uuidv4 } from "uuid";
 
@@ -262,38 +257,6 @@ export default Canister({
       }
       propertyListingStorage.remove(propertyId);
       return Ok(`property listing ${propertyId} deleted`);
-    }
-  ),
-
-
-
-  //update property
-  updateProperty: update(
-    [text, PropertyPayload],
-    Result(Property, Message),
-    (propertyId, payload) => {
-      const propertyOpt = propertyStorage.get(propertyId);
-      if (propertyOpt === null) {
-        return Err({ NotFound: "property not found" });
-      }
-      const property = propertyOpt.Some;
-      propertyStorage.insert(propertyId, { ...property, ...payload });
-      return Ok({ ...property, ...payload });
-    }
-  ),
-
-  //update user
-  updateUser: update(
-    [text, UserPayload],
-    Result(User, Message),
-    (userId, payload) => {
-      const userOpt = userStorage.get(userId);
-      if (userOpt === null) {
-        return Err({ NotFound: "user not found" });
-      }
-      const user = userOpt.Some;
-      userStorage.insert(userId, { ...user, ...payload });
-      return Ok({ ...user, ...payload });
     }
   ),
 
