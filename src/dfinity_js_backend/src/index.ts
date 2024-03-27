@@ -213,4 +213,103 @@ export default Canister({
     const user = userOpt.Some;
     return user.listing;
   }),
+
+
+  //update property listing status
+  updatePropertyListingStatus: update(
+    [text, text],
+    Result(text, Message),
+    (propertyId, status) => {
+      const listingOpt = propertyListingStorage.get(propertyId);
+      if (listingOpt === null) {
+        return Err({ NotFound: "property listing not found" });
+      }
+      const listing = listingOpt.Some;
+      listing.status = { [status]: status };
+      propertyListingStorage.insert(propertyId, listing);
+      return Ok(`property listing status updated to ${status}`);
+    }
+  ),
+
+  //delete property
+  deleteProperty: update([text], Result(text, Message), (propertyId) => {
+    const propertyOpt = propertyStorage.get(propertyId);
+    if (propertyOpt === null) {
+      return Err({ NotFound: "property not found" });
+    }
+    propertyStorage.remove(propertyId);
+    return Ok(`property ${propertyId} deleted`);
+  }),
+
+  //delete user
+  deleteUser: update([text], Result(text, Message), (userId) => {
+    const userOpt = userStorage.get(userId);
+    if (userOpt === null) {
+      return Err({ NotFound: "user not found" });
+    }
+    userStorage.remove(userId);
+    return Ok(`user ${userId} deleted`);
+  }),
+
+  //delete property listing
+  deletePropertyListing: update(
+    [text],
+    Result(text, Message),
+    (propertyId) => {
+      const listingOpt = propertyListingStorage.get(propertyId);
+      if (listingOpt === null) {
+        return Err({ NotFound: "property listing not found" });
+      }
+      propertyListingStorage.remove(propertyId);
+      return Ok(`property listing ${propertyId} deleted`);
+    }
+  ),
+
+
+
+  //update property
+  updateProperty: update(
+    [text, PropertyPayload],
+    Result(Property, Message),
+    (propertyId, payload) => {
+      const propertyOpt = propertyStorage.get(propertyId);
+      if (propertyOpt === null) {
+        return Err({ NotFound: "property not found" });
+      }
+      const property = propertyOpt.Some;
+      propertyStorage.insert(propertyId, { ...property, ...payload });
+      return Ok({ ...property, ...payload });
+    }
+  ),
+
+  //update user
+  updateUser: update(
+    [text, UserPayload],
+    Result(User, Message),
+    (userId, payload) => {
+      const userOpt = userStorage.get(userId);
+      if (userOpt === null) {
+        return Err({ NotFound: "user not found" });
+      }
+      const user = userOpt.Some;
+      userStorage.insert(userId, { ...user, ...payload });
+      return Ok({ ...user, ...payload });
+    }
+  ),
+
+  
 });
+
+// a workaround to make uuid package work with Azle
+globalThis.crypto = {
+  // @ts-ignore
+  getRandomValues: () => {
+    let array = new Uint8Array(32);
+
+    for (let i = 0; i < array.length; i++) {
+      array[i] = Math.floor(Math.random() * 256);
+    }
+
+    return array;
+  },
+};
