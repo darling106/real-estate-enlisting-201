@@ -29,7 +29,7 @@ const Property = Record({
   propType: text, //type of property(home, land, office, etc)
   description: text,//description of the property
   size: text,
-  price: nat64,
+  price: text,
 });
 
 const PropertyPayload = Record({
@@ -37,7 +37,7 @@ const PropertyPayload = Record({
   propType: text,
   description: text,
   size: text,
-  price: nat64,
+  price: text,
 });
 
 const ListingStatus = Variant({
@@ -57,14 +57,14 @@ const Listings = Record({
 const User = Record({
   id: text,
   name: text,
-  phoneNo: nat64,
+  phoneNo: text,
   email: text,
   listing: Vec(text),//list of properties the user has listed
 });
 
 const UserPayload = Record({
   name: text,
-  phoneNo: nat64,
+  phoneNo: text,
   email: text,
 });
 

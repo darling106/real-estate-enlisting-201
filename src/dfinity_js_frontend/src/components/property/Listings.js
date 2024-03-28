@@ -7,20 +7,21 @@ import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 
 import {
  addPropertyListing,
-  getProperties as getPropertyList,
-} from "../utils/../utils/realestateManager";
+  getPropertyListings as getListingList,
+} from "../../utils/realestateManager";
 import Property from "./Property";
 import AddProperty from "./AddProperty";
 import ListProperty from "./AddToListing";
+import PropertyListing from "./Listing";
 
 const  PropertiesListings = () => {
-  const [properties, setProperties] = useState([]);
+  const [listing, setListing] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getProperties = useCallback(async () => {
+  const getListing = useCallback(async () => {
     try {
-      const properties = await getPropertyList();
-      setProperties(properties);
+      const listing = await getListingList();
+      setListing(listing);
       setLoading(false);
     } catch (error) {
       NotificationError(error);
@@ -40,26 +41,45 @@ const  PropertiesListings = () => {
 
 
   useEffect(() => {
-    getProperties();
+    getListing();
   }, []);
 
   return (
-    <div>
-      <h1> PropertiesListings</h1>
-      <Link to="/users" className="btn btn-primary">
-        users
-      </Link>
-      {loading ? (
-        <Loader />
-      ) : (
-        <Row>
-          {properties.map((property) => (
-            <Property key={property.id} property={property} />
-          ))}
+    <>
+      {!loading ? (
+        <>
+          <h1>Properties</h1>
+        <Link
+              to="/"
+              className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
+            >
+              Users
+            </Link>
+        <Link
+              to="/"
+              className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
+            >
+              Listings
+            </Link>
+         <Row xs={1} sm={2} lg={3}>
+          {listing.map((_listing, index) => (
+              <PropertyListing
+                key={index}
+                listing={{
+                  ..._listing,
+                }}
+                //update={update}
+              />
+            ))}
         </Row>
-      )}
-      <ListProperty save={addProperty} />
-    </div>
+     <div>
+       <AddProperty save={addProperty} />
+     </div>
+      </>
+      ) : (
+         <Loader />
+             )}
+    </>
   );
 };
 

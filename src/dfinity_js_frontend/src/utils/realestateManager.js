@@ -26,7 +26,20 @@ export async function getUsers() {
 //get all properties
 export async function getProperties() {
   try {
-    return await window.canister.realestateManager.getProperties();
+    return await window.canister.realestateManager.getAllProperties();
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
+//get property listings
+export async function getPropertyListings() {
+  try {
+    return await window.canister.realestateManager.getAllPropertyListings();
   } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
       const authClient = window.auth.client;
@@ -43,12 +56,41 @@ export async function addPropertyListing(propertyId) {
 
 //get user by id
 export async function getUser(userId) {
-  return window.canister.realestateManager.getUserById(userId);
+  try {
+    return await window.canister.realestateManager.getUser(userId);
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
 }
 
 //get property by id
 export async function getProperty(propertyId) {
-  return window.canister.realestateManager.getPropertyById(propertyId);
+  try {
+    return await window.canister.realestateManager.getProperty(propertyId);
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
+}
+
+//get property listings
+export async function getPropertyListing(propertyId) {
+  try {
+    return await window.canister.realestateManager.getAllPropertyListing(propertyId);
+  } catch (err) {
+    if (err.name === "AgentHTTPResponseError") {
+      const authClient = window.auth.client;
+      await authClient.logout();
+    }
+    return [];
+  }
 }
 
 //make a bid

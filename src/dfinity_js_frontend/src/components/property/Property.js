@@ -13,21 +13,31 @@ const Property = ({property }) => {
         <Card.Body>
           <Card.Text>
             <Card.Title>{id}</Card.Title>
-            <Stack direction="" gap={3}>
-              <span>Size:</span>
-              <Badge>{size}</Badge>
+            <Stack direction="horizantal" gap={1}>
+           <div className="d-flex">  
+             <p>Size:</p>
+              <span>{size}</span>
+              </div>
 
-                <span>Description:</span>
-                <Badge>{description}</Badge>
+              <div className="d-flex">
+                  <Card.Text>Description:</Card.Text>
+                <span>{description}</span>
+              </div>
 
-                <span>Address:</span>
-                <Badge>{address}</Badge>
+              <div className="d-flex">
+                  <p>Address:</p>
+                <span>{address}</span>
+              </div>
 
-                <span>Type:</span>
-                <Badge>{propType}</Badge>
+               <div className="d-flex">
+                 <p>Type:</p>
+                <span>{propType}</span>
+               </div>
 
-                <span>Price:</span>
-                <Badge>{price}</Badge>
+             <div className="d-flex">
+                 <p>Price:</p>
+                <span>{price}</span>
+             </div>
 
 
             </Stack>

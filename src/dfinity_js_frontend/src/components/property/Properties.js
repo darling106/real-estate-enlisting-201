@@ -7,8 +7,9 @@ import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 
 import {
   createProperty,
+  getProperty,
   getProperties as getPropertyList,
-} from "../utils/../utils/realestateManager";
+} from "../../utils/realestateManager";
 import Property from "./Property";
 import AddProperty from "./AddProperty";
 
@@ -16,23 +17,29 @@ const Properties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getProperties = useCallback(async () => {
+   const getProperties = useCallback(async () => {
     try {
-      const properties = await getPropertyList();
-      setProperties(properties);
-      setLoading(false);
+      setLoading(true);
+      setProperties(await getPropertyList());
     } catch (error) {
-      NotificationError(error);
+      console.log({ error });
+    } finally {
+      setLoading(false);
     }
   });
 
   const addProperty = async (property) => {
     try {
-      await createProperty(property);
-      NotificationSuccess("Property added successfully");
-      getProperties();
+      setLoading(true);
+    createProperty(property).then((res) => {
+        getProperty();
+      });
+      toast.success("Property Added ");
     } catch (error) {
-      NotificationError(error);
+      console.log({ error });
+      toast(<NotificationError text="Failed to property." />);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,22 +48,43 @@ const Properties = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Properties</h1>
-      <Link to="/users" className="btn btn-primary">
-       users
-      </Link>
-      {loading ? (
-        <Loader />
-      ) : (
-        <Row>
-          {properties.map((property) => (
-            <Property key={property.id} property={property} />
-          ))}
+    <>
+      {!loading ? (
+        <>
+         <div className="d-flex justify-content-between align-items-center mb-4">
+            <h1 className="fs-4 fw-bold mb-0">Properties</h1>
+            <Link
+              to="/Users"
+              className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
+            >
+              Users
+            </Link>
+            <Link
+              to="/listings"
+              className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
+            >
+              Listings
+            </Link>
+          </div>
+         <Row xs={1} sm={2} lg={3}>
+          {properties.map((_property, index) => (
+              <Property
+                key={index}
+                property={{
+                  ..._property,
+                }}
+                //update={update}
+              />
+            ))}
         </Row>
-      )}
-      <AddProperty save={addProperty} />
-    </div>
+     <div>
+       <AddProperty save={addProperty} />
+     </div>
+      </>
+      ) : (
+         <Loader />
+             )}
+    </>
   );
 };
 

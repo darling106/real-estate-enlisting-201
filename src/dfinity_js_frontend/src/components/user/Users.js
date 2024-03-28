@@ -82,7 +82,7 @@ const Users = () => {
               Properties
             </Link>
             <Link
-              to="/"
+              to="/listings"
               className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
             >
               Listings

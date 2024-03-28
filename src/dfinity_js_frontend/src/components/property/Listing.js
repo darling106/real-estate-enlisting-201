@@ -39,4 +39,4 @@ PropertyListing.propTypes = {
   property: PropTypes.object.isRequired,
 };
 
-export default Property;
+export default PropertyListing;
