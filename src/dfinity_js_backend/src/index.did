@@ -13,7 +13,5 @@ service: () -> {
     getUser: (text) -> (opt record {id:text; listing:vec text; name:text; email:text; phoneNo:nat64}) query;
     getUserListing: (text) -> (vec text) query;
     makeBid: (text, text) -> (variant {Ok:text; Err:variant {InvalidPayload:text; NotFound:text}});
-    updateProperty: (text, record {size:text; description:text; address:text; propType:text; price:nat64}) -> (variant {Ok:record {id:text; size:text; description:text; address:text; propType:text; price:nat64}; Err:variant {InvalidPayload:text; NotFound:text}});
     updatePropertyListingStatus: (text, text) -> (variant {Ok:text; Err:variant {InvalidPayload:text; NotFound:text}});
-    updateUser: (text, record {name:text; email:text; phoneNo:nat64}) -> (variant {Ok:record {id:text; listing:vec text; name:text; email:text; phoneNo:nat64}; Err:variant {InvalidPayload:text; NotFound:text}});
 }

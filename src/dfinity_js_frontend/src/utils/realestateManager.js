@@ -1,41 +1,19 @@
 import { Principal } from "@dfinity/principal";
 import { transferICP } from "./ledger";
 
-export async function createlanguage(language) {
-  return window.canister.languageLearning.addLanguage(language);
+export async function createProperty(property) {
+  return window.canister.realestateManager.addProperty(property);
 }
 
+//create user
 export async function createUser(user) {
-  return window.canister.languageLearning.addUser(user);
+  return window.canister.realestateManager.addUser(user);
 }
 
-//function to update language
-export async function updateLanguage(language) {
-  return window.canister.languageLearning.updateLanguage(language);
-}
-
-//function to update user
-export async function updateUser(user) {
-  return window.canister.languageLearning.updateUser(user);
-}
-
-//function to get all languages 
-export async function getLanguages() {
-  try {
-    return await window.canister.languageLearning.getLanguages();
-  } catch (err) {
-    if (err.name === "AgentHTTPResponseError") {
-      const authClient = window.auth.client;
-      await authClient.logout();
-    }
-    return [];
-  }
-}
-
-//function to get all users 
+//get all users
 export async function getUsers() {
   try {
-    return await window.canister.languageLearning.getUsers();
+    return await window.canister.realestateManager.getUsers();
   } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
       const authClient = window.auth.client;
@@ -45,10 +23,10 @@ export async function getUsers() {
   }
 }
 
-//function to get language by id 
-export async function getLanguage(languageId) {
+//get all properties
+export async function getProperties() {
   try {
-    return await window.canister.languageLearning.getLanguage(languageId);
+    return await window.canister.realestateManager.getProperties();
   } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
       const authClient = window.auth.client;
@@ -58,102 +36,40 @@ export async function getLanguage(languageId) {
   }
 }
 
-//function to enroll user in language
-export async function enrollUser(user) {
-  try {
-    return await window.canister.languageLearning.enrollUser(user);
-  } catch (err) {
-    if (err.name === "AgentHTTPResponseError") {
-      const authClient = window.auth.client;
-      await authClient.logout();
-    }
-    return [];
-  }
+//add property to listing
+export async function addPropertyListing(propertyId) {
+  return window.canister.realestateManager.addPropertyListing(propertyId);
 }
 
-//get enrolled users
-export async function getEnrolledUsers() {
-  try {
-    return await window.canister.languageLearning.getEnrolledUsers();
-  } catch (err) {
-    if (err.name === "AgentHTTPResponseError") {
-      const authClient = window.auth.client;
-      await authClient.logout();
-    }
-    return [];
-  }
+//get user by id
+export async function getUser(userId) {
+  return window.canister.realestateManager.getUserById(userId);
 }
 
-
-
-//delete language by languageId
-export async function deleteLanguage(languageId) {
-  return window.canister.languageLearning.deleteLanguage(languageId);
+//get property by id
+export async function getProperty(propertyId) {
+  return window.canister.realestateManager.getPropertyById(propertyId);
 }
 
-//delete user by languageId
-export async function deleteUser(languageId) {
-  return window.canister.languageLearning.deleteUser(languageId);
+//make a bid
+export async function makeBid(userId, propertyId) {
+  return window.canister.realestateManager.makeBid(userId. propertyId);
 }
 
-//unenroll
-export async function unenrollUser(id) {
-  return window.canister.languageLearning.unenrollUser(id);
-}
-
-//complete language
-export async function completeLanguage(languageId) {
-  return window.canister.languageLearning.completeLanguage(languageId);
-}
-
-//drop language
-export async function dropLanguage(languageId) {
-  return window.canister.languageLearning.dropLanguage(languageId);
-}
-
-//get completed language
-export async function getCompletedLanguages() {
-  try {
-    return await window.canister.languageLearning.getCompletedLanguages();
-  } catch (err) {
-    if (err.name === "AgentHTTPResponseError") {
-      const authClient = window.auth.client;
-      await authClient.logout();
-    }
-    return [];
-  }
-}
-
-//get dropped languages
-export async function getDroppedLanguages() {
-  try {
-    return await window.canister.languageLearning.getDroppedLanguages();
-  } catch (err) {
-    if (err.name === "AgentHTTPResponseError") {
-      const authClient = window.auth.client;
-      await authClient.logout();
-    }
-    return [];
-  }
-}
-
-
-
-export async function buyLanguage(language) {
-  const languageLearningCanister = window.canister.languageLearning;
-  const orderResponse = await languageLearningCanister.payForCourse(language.id);
+export async function buyProperty(property) {
+  const realestateManagerCanister = window.canister.realestateManager;
+  const orderResponse = await realestateManagerCanister.payForProperty(property.id);
   const sellerPrincipal = Principal.from(orderResponse.Ok.seller);
-  const sellerAddress = await languageLearningCanister.getAddressFromPrincipal(
+  const sellerAddress = await realestateManagerCanister.getAddressFromPrincipal(
     sellerPrincipal
   );
   const block = await transferICP(
     sellerAddress,
     orderResponse.Ok.price,
     orderResponse.Ok.memo
-  );
-  await languageLearningCanister.completePurchase(
+  );realestateManagerCanister.completePurchase(
     sellerPrincipal,
-    language.id,
+    property.id,
     orderResponse.Ok.price,
     block,
     orderResponse.Ok.memo
