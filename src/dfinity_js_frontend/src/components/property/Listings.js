@@ -8,35 +8,41 @@ import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
  addPropertyListing,
   getPropertyListings as getListingList,
+  getProperties,
 } from "../../utils/realestateManager";
 import Property from "./Property";
-import AddProperty from "./AddProperty";
 import ListProperty from "./AddToListing";
 import PropertyListing from "./Listing";
 
 const  PropertiesListings = () => {
-  const [listing, setListing] = useState([]);
+  const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const getListing = useCallback(async () => {
     try {
       const listing = await getListingList();
-      setListing(listing);
+      setListings(listing);
       setLoading(false);
     } catch (error) {
       NotificationError(error);
     }
   });
 
-    const addProperty = async (property) => {
-    try {
-      await addPropertyListing(property.id);
-      NotificationSuccess("Property added successfully");
-      getProperties();
+
+     const addProperty = async (propertyId) => {
+     try {
+      setLoading(true);
+      addPropertyListing(propertyId).then(() => {
+        getProperties();
+      });
+      toast(<NotificationSuccess text="Listing sucessfull." />);
     } catch (error) {
-      NotificationError(error);
+      console.log({ error });
+      toast(<NotificationError text="Failed to list." />);
+    } finally {
+      setLoading(false);
     }
-    }
+     }
 
 
 
@@ -48,21 +54,23 @@ const  PropertiesListings = () => {
     <>
       {!loading ? (
         <>
-          <h1>Properties</h1>
-        <Link
+           <div className="d-flex justify-content-between align-items-center mb-4">
+            <h1 className="fs-4 fw-bold mb-0">Listings</h1>
+            <Link
               to="/"
+              className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
+            >
+              Properties
+            </Link>
+            <Link
+              to="/users"
               className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
             >
               Users
             </Link>
-        <Link
-              to="/"
-              className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
-            >
-              Listings
-            </Link>
+          </div>
          <Row xs={1} sm={2} lg={3}>
-          {listing.map((_listing, index) => (
+          {listings.map((_listing, index) => (
               <PropertyListing
                 key={index}
                 listing={{
@@ -73,7 +81,7 @@ const  PropertiesListings = () => {
             ))}
         </Row>
      <div>
-       <AddProperty save={addProperty} />
+       <ListProperty save={addProperty} /> 
      </div>
       </>
       ) : (

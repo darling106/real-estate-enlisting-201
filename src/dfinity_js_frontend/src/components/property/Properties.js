@@ -9,6 +9,7 @@ import {
   createProperty,
   getProperty,
   getProperties as getPropertyList,
+  addPropertyListing,
 } from "../../utils/realestateManager";
 import Property from "./Property";
 import AddProperty from "./AddProperty";
@@ -43,6 +44,17 @@ const Properties = () => {
     }
   };
 
+    const addListing = async (property) => {
+    try {
+      await addPropertyListing(property.id);
+      NotificationSuccess("Property added successfully");
+      getProperties();
+    } catch (error) {
+      NotificationError(error);
+    }
+    }
+
+
   useEffect(() => {
     getProperties();
   }, []);
@@ -74,6 +86,7 @@ const Properties = () => {
                   ..._property,
                 }}
                 //update={update}
+                addListing={addListing}
               />
             ))}
         </Row>

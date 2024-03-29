@@ -1,15 +1,15 @@
 service: () -> {
     addProperty: (record {size:text; description:text; address:text; propType:text; price:text}) -> (variant {Ok:record {id:text; size:text; description:text; address:text; propType:text; price:text}; Err:variant {InvalidPayload:text; NotFound:text}});
-    addPropertyListing: (text) -> (variant {Ok:record {status:variant {rented:text; Sold:text; Active:text; PaymentPending:text}; agent:principal; date:text; propertyId:text}; Err:variant {InvalidPayload:text; NotFound:text}});
+    addPropertyListing: (text) -> (variant {Ok:record {id:text; status:variant {rented:text; Sold:text; Active:text; PaymentPending:text}; agent:principal}; Err:variant {InvalidPayload:text; NotFound:text}});
     addUser: (record {name:text; email:text; phoneNo:text}) -> (variant {Ok:record {id:text; listing:vec text; name:text; email:text; phoneNo:text}; Err:variant {InvalidPayload:text; NotFound:text}});
     deleteProperty: (text) -> (variant {Ok:text; Err:variant {InvalidPayload:text; NotFound:text}});
     deletePropertyListing: (text) -> (variant {Ok:text; Err:variant {InvalidPayload:text; NotFound:text}});
     deleteUser: (text) -> (variant {Ok:text; Err:variant {InvalidPayload:text; NotFound:text}});
     getAllProperties: () -> (vec record {id:text; size:text; description:text; address:text; propType:text; price:text}) query;
-    getAllPropertyListings: () -> (vec record {status:variant {rented:text; Sold:text; Active:text; PaymentPending:text}; agent:principal; date:text; propertyId:text}) query;
+    getAllPropertyListings: () -> (vec record {id:text; status:variant {rented:text; Sold:text; Active:text; PaymentPending:text}; agent:principal}) query;
     getAllUsers: () -> (vec record {id:text; listing:vec text; name:text; email:text; phoneNo:text}) query;
     getProperty: (text) -> (opt record {id:text; size:text; description:text; address:text; propType:text; price:text}) query;
-    getPropertyListing: (text) -> (opt record {status:variant {rented:text; Sold:text; Active:text; PaymentPending:text}; agent:principal; date:text; propertyId:text}) query;
+    getPropertyListing: (text) -> (opt record {id:text; status:variant {rented:text; Sold:text; Active:text; PaymentPending:text}; agent:principal}) query;
     getUser: (text) -> (opt record {id:text; listing:vec text; name:text; email:text; phoneNo:text}) query;
     getUserListing: (text) -> (vec text) query;
     makeBid: (text, text) -> (variant {Ok:text; Err:variant {InvalidPayload:text; NotFound:text}});

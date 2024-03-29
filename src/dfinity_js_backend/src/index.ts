@@ -48,8 +48,8 @@ const ListingStatus = Variant({
 });
 
 const Listings = Record({
-  propertyId: text,//id of the property
-  date: text,//date the property was listed
+  id: text,//id of the property
+//date: text,//date the property was listed
   agent: Principal, //agent who listed the property
   status: ListingStatus,//status of the property listing
 });
@@ -143,15 +143,15 @@ export default Canister({
   addPropertyListing: update(
     [text],
     Result(Listings, Message),
-    (propertyId) => {
-      const propertyOpt = propertyStorage.get(propertyId);
-      if (propertyOpt === null) {
-        return Err({ NotFound: "property not found" });
-      }
-
+    (payload) => {
+     // const propertyOpt = propertyStorage.get(propertyId);
+      // if (propertyOpt === null) {
+      //   return Err({ NotFound: "property not found" });
+      // }
+    const propertyId = uuidv4()
       const listing = {
-        propertyId: propertyId,
-        date: new Date().toISOString(),
+        id: propertyId,
+       // date: new Date().toISOString(),
         agent: ic.caller(),
         status: { Active: "For sale" },
       };
