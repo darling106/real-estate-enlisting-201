@@ -25,10 +25,10 @@ import { v4 as uuidv4 } from "uuid";
 
 const Property = Record({
   id: text,
-  address: text,//address of the property
+  address: text, //address of the property
   propType: text, //type of property(home, land, office, etc)
-  description: text,//description of the property
-  size: text,
+  description: text, //description of the property
+  size: nat64,
   price: text,
 });
 
@@ -36,22 +36,25 @@ const PropertyPayload = Record({
   address: text,
   propType: text,
   description: text,
-  size: text,
+  size: nat64,
   price: text,
 });
 
 const ListingStatus = Variant({
-  Active: text,//property is available for sale
-  Sold: text,//property has been sold
-  rented: text,//property has been rented
-  PaymentPending: text,//payment for property is pending
+  Active: text, //property is available for sale
+  Sold: text, //property has been sold
+  rented: text, //property has been rented
+  PaymentPending: text, //payment for property is pending
 });
 
 const Listings = Record({
-  id: text,//id of the property
-//date: text,//date the property was listed
-  agent: Principal, //agent who listed the property
-  status: ListingStatus,//status of the property listing
+  id: text, //id of the property
+  propAddress: text, //address of the property
+  propType: text, //type of property(home, land, office, etc)
+  propDescription: text, //description of the property
+  propSize: nat64,
+  propPrice: text,
+  status: ListingStatus,
 });
 
 const User = Record({
@@ -59,7 +62,7 @@ const User = Record({
   name: text,
   phoneNo: text,
   email: text,
-  listing: Vec(text),//list of properties the user has listed
+  listing: Vec(text), //list of properties the user has listed
 });
 
 const UserPayload = Record({
@@ -95,12 +98,12 @@ export default Canister({
         return Err({ NotFound: "invalid payoad" });
       }
       const propertyId = uuidv4();
-      const propety = {
+      const property = {
         id: propertyId,
         ...payload,
       };
-      propertyStorage.insert(propertyId, propety);
-      return Ok(propety);
+      propertyStorage.insert(propertyId, property);
+      return Ok(property);
     }
   ),
 
@@ -139,21 +142,24 @@ export default Canister({
     return userStorage.values();
   }),
 
-  //add property listing
+  //add property listing by adding property details to property listing storage
   addPropertyListing: update(
     [text],
     Result(Listings, Message),
-    (payload) => {
-     // const propertyOpt = propertyStorage.get(propertyId);
-      // if (propertyOpt === null) {
-      //   return Err({ NotFound: "property not found" });
-      // }
-    const propertyId = uuidv4()
+    (propertyId) => {
+      const propertyOpt = propertyStorage.get(propertyId);
+      if (propertyOpt === null) {
+        return Err({ NotFound: "property not found" });
+      }
+      const property = propertyOpt.Some;
       const listing = {
         id: propertyId,
-       // date: new Date().toISOString(),
-        agent: ic.caller(),
-        status: { Active: "For sale" },
+        propAddress: property.address,
+        propType: property.propType,
+        propDescription: property.description,
+        propSize: property.size,
+        propPrice: property.price,
+        status: { Active: "Active" },
       };
       propertyListingStorage.insert(propertyId, listing);
       return Ok(listing);
@@ -171,33 +177,31 @@ export default Canister({
   }),
 
   //user add property to listing
-  makeBid: update(
-    [text, text],
-    Result(text, Message),
-    (userId, propertyId) => {
-      const userOpt = userStorage.get(userId);
-      if (userOpt === null) {
-        return Err({ NotFound: "user not found" });
-      }
-      const propertyOpt = propertyStorage.get(propertyId);
-      if (propertyOpt === null) {
-        return Err({ NotFound: "property not found" });
-      }
-
-      const user = userOpt.Some;
-      user.listing.push(propertyId);
-      userStorage.insert(userId, user);
-
-      const listingOpt = propertyListingStorage.get(propertyId);
-      if (listingOpt === null) {
-        return Err({ NotFound: "property listing not found" });
-      }
-      const listing = listingOpt.Some;
-      listing.status = { PaymentPending: "Payment_Pending" };
-      propertyListingStorage.insert(propertyId, listing);
-      return Ok(`property ${propertyId} added to user ${userId}listing and status updated`);
+  makeBid: update([text, text], Result(text, Message), (userId, propertyId) => {
+    const userOpt = userStorage.get(userId);
+    if (userOpt === null) {
+      return Err({ NotFound: "user not found" });
     }
-  ),
+    const propertyOpt = propertyStorage.get(propertyId);
+    if (propertyOpt === null) {
+      return Err({ NotFound: "property not found" });
+    }
+
+    const user = userOpt.Some;
+    user.listing.push(propertyId);
+    userStorage.insert(userId, user);
+
+    const listingOpt = propertyListingStorage.get(propertyId);
+    if (listingOpt === null) {
+      return Err({ NotFound: "property listing not found" });
+    }
+    const listing = listingOpt.Some;
+    listing.status = { PaymentPending: "Payment_Pending" };
+    propertyListingStorage.insert(propertyId, listing);
+    return Ok(
+      `property ${propertyId} added to user ${userId}listing and status updated`
+    );
+  }),
 
   //get user listing
   getUserListing: query([text], Vec(text), (userId) => {
@@ -208,7 +212,6 @@ export default Canister({
     const user = userOpt.Some;
     return user.listing;
   }),
-
 
   //update property listing status
   updatePropertyListingStatus: update(
@@ -247,20 +250,14 @@ export default Canister({
   }),
 
   //delete property listing
-  deletePropertyListing: update(
-    [text],
-    Result(text, Message),
-    (propertyId) => {
-      const listingOpt = propertyListingStorage.get(propertyId);
-      if (listingOpt === null) {
-        return Err({ NotFound: "property listing not found" });
-      }
-      propertyListingStorage.remove(propertyId);
-      return Ok(`property listing ${propertyId} deleted`);
+  deletePropertyListing: update([text], Result(text, Message), (propertyId) => {
+    const listingOpt = propertyListingStorage.get(propertyId);
+    if (listingOpt === null) {
+      return Err({ NotFound: "property listing not found" });
     }
-  ),
-
-  
+    propertyListingStorage.remove(propertyId);
+    return Ok(`property listing ${propertyId} deleted`);
+  }),
 });
 
 // a workaround to make uuid package work with Azle

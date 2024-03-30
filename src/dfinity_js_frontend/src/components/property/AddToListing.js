@@ -3,9 +3,9 @@ import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
 const ListProperty = ({ save }) => {
- const [propertyId, setPropertyId] = useState("");
+  const [propertyId, setPropertyId] = useState("");
 
-    const isFormFilled = () => propertyId;
+  const isFormFilled = () => propertyId;
 
   const [show, setShow] = useState(false);
 

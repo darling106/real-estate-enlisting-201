@@ -18,7 +18,7 @@ const Properties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
-   const getProperties = useCallback(async () => {
+  const getProperties = useCallback(async () => {
     try {
       setLoading(true);
       setProperties(await getPropertyList());
@@ -32,7 +32,7 @@ const Properties = () => {
   const addProperty = async (property) => {
     try {
       setLoading(true);
-    createProperty(property).then((res) => {
+      createProperty(property).then((res) => {
         getProperty();
       });
       toast.success("Property Added ");
@@ -44,16 +44,15 @@ const Properties = () => {
     }
   };
 
-    const addListing = async (property) => {
-    try {
-      await addPropertyListing(property.id);
-      NotificationSuccess("Property added successfully");
-      getProperties();
-    } catch (error) {
-      NotificationError(error);
-    }
-    }
-
+  // const addListing = async (property) => {
+  // try {
+  //   await addPropertyListing(property.id);
+  //   NotificationSuccess("Property added successfully");
+  //   getProperties();
+  // } catch (error) {
+  //   NotificationError(error);
+  // }
+  // }
 
   useEffect(() => {
     getProperties();
@@ -63,7 +62,7 @@ const Properties = () => {
     <>
       {!loading ? (
         <>
-         <div className="d-flex justify-content-between align-items-center mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-4">
             <h1 className="fs-4 fw-bold mb-0">Properties</h1>
             <Link
               to="/Users"
@@ -78,25 +77,25 @@ const Properties = () => {
               Listings
             </Link>
           </div>
-         <Row xs={1} sm={2} lg={3}>
-          {properties.map((_property, index) => (
+          <Row xs={1} sm={2} lg={3}>
+            {properties.map((_property, index) => (
               <Property
                 key={index}
                 property={{
                   ..._property,
                 }}
                 //update={update}
-                addListing={addListing}
+                // addListing={addListing}
               />
             ))}
-        </Row>
-     <div>
-       <AddProperty save={addProperty} />
-     </div>
-      </>
+          </Row>
+          <div>
+            <AddProperty save={addProperty} />
+          </div>
+        </>
       ) : (
-         <Loader />
-             )}
+        <Loader />
+      )}
     </>
   );
 };

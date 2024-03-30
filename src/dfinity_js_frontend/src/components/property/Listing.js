@@ -3,8 +3,9 @@ import PropTypes from "prop-types";
 import { Card, Col, Badge, Stack } from "react-bootstrap";
 import { Principal } from "@dfinity/principal";
 
-const PropertyListing = ({ property }) => {
-  const { id, size, description, address, propType, price } = property;
+const PropertyListing = ({ listing }) => {
+  const { id, propSize, propDescription, propAddress, propType, propPrice } =
+    listing;
 
   return (
     <Col md={4} className="mb-4">
@@ -14,19 +15,19 @@ const PropertyListing = ({ property }) => {
             <Card.Title>{id}</Card.Title>
             <Stack direction="" gap={3}>
               <span>Size:</span>
-              <Badge>{size}</Badge>
+              <Badge>{propSize}</Badge>
 
               <span>Description:</span>
-              <Badge>{description}</Badge>
+              <Badge>{propDescription}</Badge>
 
               <span>Address:</span>
-              <Badge>{address}</Badge>
+              <Badge>{propAddress}</Badge>
 
               <span>Type:</span>
               <Badge>{propType}</Badge>
 
               <span>Price:</span>
-              <Badge>{price}</Badge>
+              <Badge>{propPrice}</Badge>
             </Stack>
           </Card.Text>
         </Card.Body>
@@ -36,7 +37,7 @@ const PropertyListing = ({ property }) => {
 };
 
 PropertyListing.propTypes = {
-  property: PropTypes.object.isRequired,
+  listing: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default PropertyListing;

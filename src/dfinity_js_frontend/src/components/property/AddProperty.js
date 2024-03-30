@@ -1,22 +1,21 @@
-
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
 const AddProperty = ({ save }) => {
-    const [size, setSize] = useState("");
-    const [description, setDescription] = useState("");
-    const [address, setAddress] = useState("");
-    const [propType, setPropType] = useState("");
-    const [price, setPrice] = useState("");
+  const [size, setSize] = useState("");
+  const [description, setDescription] = useState("");
+  const [address, setAddress] = useState("");
+  const [propType, setPropType] = useState("");
+  const [price, setPrice] = useState("");
 
-    const isFormFilled = () => size && description && address && propType && price;
+  const isFormFilled = () =>
+    size && description && address && propType && price;
 
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
 
   return (
     <>
@@ -32,7 +31,7 @@ const AddProperty = ({ save }) => {
           <Form>
             <FloatingLabel controlId="floatingInput" label="Size">
               <Form.Control
-                type="text"
+                type="number"
                 placeholder="Size"
                 value={size}
                 onChange={(e) => setSize(e.target.value)}

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 
 import {
- addPropertyListing,
+  addPropertyListing,
   getPropertyListings as getListingList,
   getProperties,
 } from "../../utils/realestateManager";
@@ -14,7 +14,7 @@ import Property from "./Property";
 import ListProperty from "./AddToListing";
 import PropertyListing from "./Listing";
 
-const  PropertiesListings = () => {
+const PropertiesListings = () => {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,9 +28,8 @@ const  PropertiesListings = () => {
     }
   });
 
-
-     const addProperty = async (propertyId) => {
-     try {
+  const addProperty = async (propertyId) => {
+    try {
       setLoading(true);
       addPropertyListing(propertyId).then(() => {
         getProperties();
@@ -42,9 +41,7 @@ const  PropertiesListings = () => {
     } finally {
       setLoading(false);
     }
-     }
-
-
+  };
 
   useEffect(() => {
     getListing();
@@ -54,7 +51,7 @@ const  PropertiesListings = () => {
     <>
       {!loading ? (
         <>
-           <div className="d-flex justify-content-between align-items-center mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-4">
             <h1 className="fs-4 fw-bold mb-0">Listings</h1>
             <Link
               to="/"
@@ -69,8 +66,8 @@ const  PropertiesListings = () => {
               Users
             </Link>
           </div>
-         <Row xs={1} sm={2} lg={3}>
-          {listings.map((_listing, index) => (
+          <Row xs={1} sm={2} lg={3}>
+            {listings.map((_listing, index) => (
               <PropertyListing
                 key={index}
                 listing={{
@@ -79,16 +76,16 @@ const  PropertiesListings = () => {
                 //update={update}
               />
             ))}
-        </Row>
-     <div>
-       <ListProperty save={addProperty} /> 
-     </div>
-      </>
+          </Row>
+          <div>
+            <ListProperty save={addProperty} />
+          </div>
+        </>
       ) : (
-         <Loader />
-             )}
+        <Loader />
+      )}
     </>
   );
 };
 
-export default  PropertiesListings;
+export default PropertiesListings;
