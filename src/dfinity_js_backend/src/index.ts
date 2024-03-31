@@ -28,7 +28,7 @@ const Property = Record({
   address: text, //address of the property
   propType: text, //type of property(home, land, office, etc)
   description: text, //description of the property
-  size: nat64,
+  size: text,
   price: text,
 });
 
@@ -36,7 +36,7 @@ const PropertyPayload = Record({
   address: text,
   propType: text,
   description: text,
-  size: nat64,
+  size: text,
   price: text,
 });
 
@@ -52,9 +52,10 @@ const Listings = Record({
   propAddress: text, //address of the property
   propType: text, //type of property(home, land, office, etc)
   propDescription: text, //description of the property
-  propSize: nat64,
+  propSize: text,
   propPrice: text,
   status: ListingStatus,
+  //userId: Vec(text), //list of users who have listed the property
 });
 
 const User = Record({
@@ -69,6 +70,18 @@ const UserPayload = Record({
   name: text,
   phoneNo: text,
   email: text,
+});
+
+const bid = Record({
+  id: text,
+  userId: text,
+  propertyId: text,
+  status: text,
+});
+
+const bidPayload = Record({
+  userId: text,
+  propertyId: text,
 });
 
 const Message = Variant({
@@ -160,6 +173,7 @@ export default Canister({
         propSize: property.size,
         propPrice: property.price,
         status: { Active: "Active" },
+        //userId: [],
       };
       propertyListingStorage.insert(propertyId, listing);
       return Ok(listing);
@@ -176,32 +190,51 @@ export default Canister({
     return propertyListingStorage.values();
   }),
 
-  //user add property to listing
-  makeBid: update([text, text], Result(text, Message), (userId, propertyId) => {
-    const userOpt = userStorage.get(userId);
-    if (userOpt === null) {
-      return Err({ NotFound: "user not found" });
-    }
-    const propertyOpt = propertyStorage.get(propertyId);
-    if (propertyOpt === null) {
-      return Err({ NotFound: "property not found" });
-    }
 
-    const user = userOpt.Some;
-    user.listing.push(propertyId);
-    userStorage.insert(userId, user);
+  //make bid 
+  makeBid: update([bidPayload], Result(bid, Message), (payload) => {
+    if (typeof payload !== "object" || Object.keys(payload).length === 0) {
+      return Err({ NotFound: "invalid payoad" });
+    }
+    const bidId = uuidv4();
+    const bid = {
+      id: bidId,
+      status: "Pending",
+      ...payload,
+    };
 
-    const listingOpt = propertyListingStorage.get(propertyId);
+    const listingOpt = propertyListingStorage.get(bid.propertyId);
     if (listingOpt === null) {
       return Err({ NotFound: "property listing not found" });
     }
-    const listing = listingOpt.Some;
-    listing.status = { PaymentPending: "Payment_Pending" };
-    propertyListingStorage.insert(propertyId, listing);
-    return Ok(
-      `property ${propertyId} added to user ${userId}listing and status updated`
-    );
+    
+    //add property id to user listing
+    const userOpt = userStorage.get(bid.userId);
+    if (userOpt === null) {
+      return Err({ NotFound: "user not found" });
+    }
+    const user = userOpt.Some;
+    user.listing.push(bid.propertyId);
+    userStorage.insert(bid.userId, user);
+    
+
+    return Ok(bid);
   }),
+
+
+  
+  
+
+  //get bids for a property
+  getBids: query([text], Vec(bid), (propertyId) => {
+    const listingOpt = propertyListingStorage.get(propertyId);
+    if (listingOpt === null) {
+      return [];
+    }
+    const listing = listingOpt.Some;
+    return listing.bids;
+  }),
+
 
   //get user listing
   getUserListing: query([text], Vec(text), (userId) => {

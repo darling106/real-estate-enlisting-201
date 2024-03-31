@@ -10,10 +10,19 @@ const App = function AppWrapper() {
   return (
     <Router>
       <Routes>
-        <Route exact path="/" element={<PropertiesPage />} />
-        <Route path="/users" element ={<UsersPage />} />
-        <Route path="/listings" element ={<ListingPage />} />
-       
+        <Route
+          exact
+          path="/"
+          element={<PropertiesPage />}
+        />
+        <Route
+          path="/users"
+          element={<UsersPage />}
+        />
+        <Route
+          path="/listings"
+          element={<ListingPage />}
+        />
       </Routes>
     </Router>
   );

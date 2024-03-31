@@ -2,18 +2,18 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 
-const MakeDid = ({ save }) => {
+const MakeDid = ({ bidForProperty }) => {
   const [userId, setUserId] = useState("");
- const [propertyId, setPropertyId] = useState
+  //const [propertyId, setPropertyId] = useState;
 
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-    const isFormFilled = () => userId && propertyId
+  const isFormFilled = () => userId;
 
- return (
+  return (
     <>
       <Button variant="primary" onClick={handleShow}>
         Make a Bid
@@ -35,7 +35,7 @@ const MakeDid = ({ save }) => {
                 />
               </FloatingLabel>
             </Form.Group>
-            <Form.Group className="mb-3" controlId="propertyId">
+            {/* <Form.Group className="mb-3" controlId="propertyId">
               <FloatingLabel controlId="propertyId" label="Property ID">
                 <Form.Control
                   type="text"
@@ -44,7 +44,7 @@ const MakeDid = ({ save }) => {
                   onChange={(e) => setPropertyId(e.target.value)}
                 />
               </FloatingLabel>
-            </Form.Group>
+            </Form.Group> */}
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -55,7 +55,7 @@ const MakeDid = ({ save }) => {
             variant="primary"
             onClick={() => {
               if (isFormFilled()) {
-                save(userId, propertyId);
+                bidForProperty(userId);
                 handleClose();
               }
             }}
@@ -65,10 +65,10 @@ const MakeDid = ({ save }) => {
         </Modal.Footer>
       </Modal>
     </>
- )
+  );
 };
 
 MakeDid.propTypes = {
-  save: PropTypes.func.isRequired,
+  bidForProperty: PropTypes.func.isRequired,
 };
 export default MakeDid;

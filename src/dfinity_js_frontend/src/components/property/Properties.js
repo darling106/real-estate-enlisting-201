@@ -44,15 +44,15 @@ const Properties = () => {
     }
   };
 
-  // const addListing = async (property) => {
-  // try {
-  //   await addPropertyListing(property.id);
-  //   NotificationSuccess("Property added successfully");
-  //   getProperties();
-  // } catch (error) {
-  //   NotificationError(error);
-  // }
-  // }
+  //  const addListing = async (property) => {
+  //  try {
+  //    await addPropertyListing(property.id);
+  //    NotificationSuccess("Property added successfully");
+  //    getProperties();
+  //  } catch (error) {
+  //    NotificationError(error);
+  //  }
+  //  }
 
   useEffect(() => {
     getProperties();
@@ -65,13 +65,13 @@ const Properties = () => {
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h1 className="fs-4 fw-bold mb-0">Properties</h1>
             <Link
-              to="/Users"
+              to="/users?canisterId=br5f7-7uaaa-aaaaa-qaaca-cai"
               className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
             >
               Users
             </Link>
             <Link
-              to="/listings"
+              to="/listings?canisterId=br5f7-7uaaa-aaaaa-qaaca-cai"
               className="justify-content-start mr-4 py-2 px-3 my-2 bg-secondary text-white rounded-pill "
             >
               Listings
@@ -89,9 +89,8 @@ const Properties = () => {
               />
             ))}
           </Row>
-          <div>
-            <AddProperty save={addProperty} />
-          </div>
+
+          <AddProperty save={addProperty} />
         </>
       ) : (
         <Loader />

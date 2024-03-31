@@ -13,7 +13,7 @@ export async function createUser(user) {
 //get all users
 export async function getUsers() {
   try {
-    return await window.canister.realestateManager.getUsers();
+    return await window.canister.realestateManager.getAllUsers();
   } catch (err) {
     if (err.name === "AgentHTTPResponseError") {
       const authClient = window.auth.client;
@@ -94,8 +94,8 @@ export async function getPropertyListing(propertyId) {
 }
 
 //make a bid
-export async function makeBid(userId, propertyId) {
-  return window.canister.realestateManager.makeBid(userId. propertyId);
+export async function makeBid(bid) {
+  return window.canister.realestateManager.makeBid(bid);
 }
 
 export async function buyProperty(property) {
