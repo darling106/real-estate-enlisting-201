@@ -54,19 +54,6 @@ export async function addPropertyListing(propertyId) {
   return window.canister.realestateManager.addPropertyListing(propertyId);
 }
 
-//get user by id
-export async function getUser(userId) {
-  try {
-    return await window.canister.realestateManager.getUser(userId);
-  } catch (err) {
-    if (err.name === "AgentHTTPResponseError") {
-      const authClient = window.auth.client;
-      await authClient.logout();
-    }
-    return [];
-  }
-}
-
 //get property by id
 export async function getProperty(propertyId) {
   try {

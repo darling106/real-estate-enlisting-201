@@ -1,14 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Card, Col, Badge, Stack } from "react-bootstrap";
-import { Principal } from "@dfinity/principal";
-import ListProperty from "./AddToListing";
+
 
 const Property = ({ property }) => {
   const { id, size, description, address, propType, price } = property;
 
   return (
-    <Col md={4} className="mb-4">
+    <>
+      <Col md={4} className="mb-4">
       <Card className=" position-relative">
         <Card.Body>
           <>
@@ -45,11 +45,12 @@ const Property = ({ property }) => {
         </Card.Body>
       </Card>
     </Col>
+    </>
   );
 };
 
 Property.propTypes = {
-  property: PropTypes.object.isRequired,
+  property: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default Property;

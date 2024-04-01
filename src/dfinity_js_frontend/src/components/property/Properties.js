@@ -9,14 +9,13 @@ import {
   createProperty,
   getProperty,
   getProperties as getPropertyList,
-  addPropertyListing,
 } from "../../utils/realestateManager";
 import Property from "./Property";
 import AddProperty from "./AddProperty";
 
 const Properties = () => {
   const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
+ const [loading, setLoading] = useState(false);
 
   const getProperties = useCallback(async () => {
     try {
@@ -29,30 +28,21 @@ const Properties = () => {
     }
   });
 
-  const addProperty = async (property) => {
+  const addProperty = async (data) => {
     try {
       setLoading(true);
-      createProperty(property).then((res) => {
-        getProperty();
+      createProperty(data).then((res) => {
+        getProperties();
       });
-      toast.success("Property Added ");
+      toast(<NotificationSuccess text="Property added." />);
     } catch (error) {
       console.log({ error });
-      toast(<NotificationError text="Failed to property." />);
+      toast(<NotificationError text="Failed to add property." />);
     } finally {
       setLoading(false);
     }
   };
 
-  //  const addListing = async (property) => {
-  //  try {
-  //    await addPropertyListing(property.id);
-  //    NotificationSuccess("Property added successfully");
-  //    getProperties();
-  //  } catch (error) {
-  //    NotificationError(error);
-  //  }
-  //  }
 
   useEffect(() => {
     getProperties();
@@ -84,8 +74,6 @@ const Properties = () => {
                 property={{
                   ..._property,
                 }}
-                //update={update}
-                // addListing={addListing}
               />
             ))}
           </Row>

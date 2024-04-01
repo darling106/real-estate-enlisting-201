@@ -8,7 +8,7 @@ service: () -> {
     getAllProperties: () -> (vec record {id:text; size:text; description:text; address:text; propType:text; price:text}) query;
     getAllPropertyListings: () -> (vec record {id:text; status:variant {rented:text; Sold:text; Active:text; PaymentPending:text}; propDescription:text; propSize:text; propType:text; propAddress:text; propPrice:text}) query;
     getAllUsers: () -> (vec record {id:text; listing:vec text; name:text; email:text; phoneNo:text}) query;
-    getBids: (text) -> (vec text) query;
+    getBids: (text) -> (vec record {id:text; status:text; userId:text; propertyId:text}) query;
     getProperty: (text) -> (opt record {id:text; size:text; description:text; address:text; propType:text; price:text}) query;
     getPropertyListing: (text) -> (opt record {id:text; status:variant {rented:text; Sold:text; Active:text; PaymentPending:text}; propDescription:text; propSize:text; propType:text; propAddress:text; propPrice:text}) query;
     getUser: (text) -> (opt record {id:text; listing:vec text; name:text; email:text; phoneNo:text}) query;

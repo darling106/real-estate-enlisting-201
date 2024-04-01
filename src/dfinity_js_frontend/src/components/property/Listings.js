@@ -8,8 +8,8 @@ import { NotificationSuccess, NotificationError } from "../utils/Notifications";
 import {
   addPropertyListing,
   getPropertyListings as getListingList,
-  //getProperties as getPropertyList,
   makeBid,
+  getUsers,
 } from "../../utils/realestateManager";
 import Property from "./Property";
 import ListProperty from "./AddToListing";
@@ -17,64 +17,51 @@ import PropertyListing from "./Listing";
 
 const PropertiesListings = () => {
   const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchListings = useCallback(async () => {
     try {
-      const _listings = await getListingList();
-      setListings(_listings);
-      setLoading(false);
+      setLoading(true);
+      setListings(await getListingList());
     } catch (error) {
       NotificationError("Error", error.message);
+    } finally {
       setLoading(false);
     }
-  }
-  , []);
-
-  useEffect(() => {
-    fetchListings();
-  }
-  , [fetchListings]);
+  });
 
   const addProperty = async ({ propertyId }) => {
     try {
-      await addPropertyListing(propertyId);
-      NotificationSuccess("Success", "Property added to listing");
-      fetchListings();
+      setLoading(true);
+      addPropertyListing(propertyId).then((res) => {
+        fetchListings();
+      });
+      toast(<NotificationSuccess text="Property added." />);
+    } catch (error) {
+      console.log({ error });
+      toast(<NotificationError text="Failed to add property." />);
+    } finally {
+      setLoading(false);
     }
-    catch (error) {
-      NotificationError("Error", "Error adding property to listing");
-    }
-
   };
 
-  //make a bid
-  // const makeBid = async (makeBid) => {
-  //   try {
-  //     await makeBid(makeBid);
-  //     NotificationSuccess("Success", "Bid made successfully");
-  //   } catch (error) {
-  //     NotificationError("Error", error.message);
-  //   }
-  // };
+  const bidForProperty = async (bid) => {
+    try {
+      setLoading(true);
+      makeBid(bid).then(() => {
+        getUsers();
+      });
+       toast(<NotificationSuccess text="Bid was successfully added" />);
+    } catch (error) {
+      toast(<NotificationError text="Failed to Bid." />);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const bidForProperty = async (bid) => {
-      try {
-        setLoading(true);
-        makeBid(bid).then((resp) => {
-          fetchListings();
-          toast(
-            <NotificationSuccess text="Bid was successfully added" />
-          );
-        });
-      } catch (error) {
-        toast(<NotificationError text="Failed to Bid." />);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-
+  useEffect(() => {
+    fetchListings();
+  }, []);
 
   return (
     <>
@@ -102,8 +89,6 @@ const PropertiesListings = () => {
                 listing={{
                   ..._listing,
                 }}
-                //update={update}
-                //remove={remove}
                 bidForProperty={bidForProperty}
               />
             ))}

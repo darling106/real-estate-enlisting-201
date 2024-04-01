@@ -78,11 +78,11 @@ const AddProperty = ({ save }) => {
           <Button
             variant="primary"
             onClick={() => {
-              if (isFormFilled()) {
+              
                 save({ size, description, address, propType, price });
                 handleClose();
-              }
             }}
+            disabled={!isFormFilled()}
           >
             Save
           </Button>
