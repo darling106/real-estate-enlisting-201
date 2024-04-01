@@ -213,6 +213,7 @@ export default Canister({
     if (userOpt === null) {
       return Err({ NotFound: "user not found" });
     }
+
     const user = userOpt.Some;
     user.listing.push(bid.propertyId);
     userStorage.insert(bid.userId, user);

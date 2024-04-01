@@ -67,24 +67,22 @@ export async function getProperty(propertyId) {
   }
 }
 
-//get property listings
-export async function getPropertyListing(propertyId) {
-  try {
-    return await window.canister.realestateManager.getAllPropertyListing(propertyId);
-  } catch (err) {
-    if (err.name === "AgentHTTPResponseError") {
-      const authClient = window.auth.client;
-      await authClient.logout();
-    }
-    return [];
-  }
-}
+
 
 //make a bid
+// export async function makeBid(bid) {
+//   return window.canister.realestateManager.makeBid(bid);
+// }
 export async function makeBid(bid) {
-  return window.canister.realestateManager.makeBid(bid);
+  try {
+    await window.canister.realestateManager.makeBid(bid);
+  
+    window.location.reload();
+  } catch (error) {
+    // Handle any errors that may occur during the bid process
+    console.error("Error making bid:", error);
+  }
 }
-
 export async function buyProperty(property) {
   const realestateManagerCanister = window.canister.realestateManager;
   const orderResponse = await realestateManagerCanister.payForProperty(property.id);
